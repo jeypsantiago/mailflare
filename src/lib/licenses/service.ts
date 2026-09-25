@@ -49,11 +49,14 @@ export async function getLicenseEntitlements(env: CloudflareEnv): Promise<Licens
 		return {
 			plan: status.plan,
 			canCustomizeBranding: status.active && (status.plan === "pro" || status.plan === "team"),
-			canManageAccounts: status.active && status.plan === "team",
+			// PATCH (self-hosted fork): Team-account management is unlocked locally.
+			// Re-apply this after syncing with upstream (see commit "patch: unlock team accounts").
+			canManageAccounts: true,
 			canForwardEmail: status.active && (status.plan === "pro" || status.plan === "team"),
 		};
 	} catch {
-		return { plan: "community", canCustomizeBranding: false, canManageAccounts: false, canForwardEmail: false };
+		// PATCH (self-hosted fork): keep accounts unlocked even if the license row can't be read.
+		return { plan: "community", canCustomizeBranding: false, canManageAccounts: true, canForwardEmail: false };
 	}
 }
 
