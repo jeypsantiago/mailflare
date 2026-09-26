@@ -70,10 +70,20 @@ export default function AccountsPage() {
 
 	return <div className="space-y-6">
 		<div className="flex items-center justify-between gap-4"><div><h1 className="text-3xl font-medium text-neutral-900">Accounts</h1><p className="mt-2 text-sm text-neutral-500">Manage Team accounts and their inboxes.</p></div>{!teamRequired && <Button onClick={() => setCreateOpen(true)}><Plus className="h-4 w-4" />New account</Button>}</div>
-		<div className="relative">{teamRequired && <LicenseRequiredOverlay required="Team"><div className="min-h-48 rounded-3xl bg-white" /></LicenseRequiredOverlay>}<List>
-			{loading && <p className="text-sm text-neutral-500">Loading...</p>}
-			{accounts.map((account) => <ListRow key={account.id} asChild><Link href={`/accounts/${account.id}`}><span style={getAvatarColorStyle(account.email)} className="relative flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full font-semibold duration-200">{account.name.charAt(0).toUpperCase()}{account.hasAvatar && <ProgressiveAvatarImage src={`/api/accounts/${account.id}/avatar`} alt="" className="absolute inset-0 h-full w-full object-cover" />}</span><span className="min-w-0"><span className="flex items-center gap-2"><span className="truncate font-semibold text-neutral-900">{account.name}</span><span className="rounded-full bg-neutral-100 px-2 py-0.5 text-xs font-medium capitalize text-neutral-600">{account.role}</span></span><span className="block truncate text-sm text-neutral-500">{account.email}</span></span></Link></ListRow>)}
-		</List></div>
+		<div className="relative">{teamRequired && <LicenseRequiredOverlay required="Team"><div className="min-h-48 rounded-3xl bg-white" /></LicenseRequiredOverlay>}
+			{loading ? <p className="text-sm text-neutral-500">Loading...</p> : <div className="grid gap-6 lg:grid-cols-2">
+				{(["admin", "user"] as const).map((roleGroup) => {
+					const group = accounts.filter((account) => account.role === roleGroup);
+					return <section key={roleGroup} className="space-y-2">
+						<h2 className="px-1 text-xs font-semibold uppercase tracking-wide text-neutral-500">{roleGroup === "admin" ? "Admins" : "Users"}</h2>
+						<List>
+							{group.length === 0 && <p className="px-1 py-4 text-sm text-neutral-400">No {roleGroup === "admin" ? "admin" : "user"} accounts yet.</p>}
+							{group.map((account) => <ListRow key={account.id} asChild><Link href={`/accounts/${account.id}`}><span style={getAvatarColorStyle(account.email)} className="relative flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full font-semibold duration-200">{account.name.charAt(0).toUpperCase()}{account.hasAvatar && <ProgressiveAvatarImage src={`/api/accounts/${account.id}/avatar`} alt="" className="absolute inset-0 h-full w-full object-cover" />}</span><span className="min-w-0"><span className="flex items-center gap-2"><span className="truncate font-semibold text-neutral-900">{account.name}</span><span className="rounded-full bg-neutral-100 px-2 py-0.5 text-xs font-medium capitalize text-neutral-600">{account.role}</span></span><span className="block truncate text-sm text-neutral-500">{account.email}</span></span></Link></ListRow>)}
+						</List>
+					</section>;
+				})}
+			</div>}
+		</div>
 		<Dialog open={createOpen} onOpenChange={setCreateOpen}><DialogContent><DialogHeader><DialogTitle>Add user account</DialogTitle><DialogDescription>The user can sign in with this email and password.</DialogDescription></DialogHeader><form onSubmit={createAccount} className="space-y-4">
 			<div className="space-y-2"><Label htmlFor="account-username">Email</Label><div className="flex h-10 overflow-hidden rounded-md border border-neutral-200 bg-white"><Input id="account-username" value={username} onChange={(event) => {
 				const value = event.target.value;
