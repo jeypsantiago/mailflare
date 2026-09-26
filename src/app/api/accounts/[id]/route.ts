@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import { getDb } from "@/db";
 import { users } from "@/db/schema";
 import { updateManagedAccountSchema } from "@/lib/validators";
-import { requireTeamAdmin } from "../utils";
+import { requireTeamAdmin, zodErrorMessage } from "../utils";
 import { getLicenseEntitlements } from "@/lib/licenses/service";
 import type { AccountRouteParams } from "./types";
 import { selectAccountById, updateAccountCredentials } from "./utils";
@@ -42,7 +42,7 @@ export async function PATCH(request: Request, { params }: AccountRouteParams) {
 		return NextResponse.json({ error: "Account not found" }, { status: 404 });
 	}
 	const parsed = updateManagedAccountSchema.safeParse(await request.json());
-	if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
+	if (!parsed.success) return NextResponse.json({ error: zodErrorMessage(parsed.error) }, { status: 400 });
 	const canForwardEmail = (await getLicenseEntitlements(access.env)).canForwardEmail;
 	if (!canForwardEmail && parsed.data.forwardingEmail && parsed.data.forwardingEmail !== account.forwardingEmail) {
 		return NextResponse.json({ error: "A Pro or Team license is required for email forwarding" }, { status: 403 });

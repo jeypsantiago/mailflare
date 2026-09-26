@@ -1,5 +1,6 @@
 import { and, desc, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
+import type { ZodError } from "zod";
 import type { getDb } from "@/db";
 import { domains, mailboxes, users } from "@/db/schema";
 import { assertAdmin } from "@/lib/auth/admin";
@@ -8,6 +9,10 @@ import { getLicenseEntitlements } from "@/lib/licenses/service";
 import { getEnv } from "@/lib/cloudflare";
 
 type Db = ReturnType<typeof getDb>;
+
+export function zodErrorMessage(error: ZodError): string {
+	return error.issues.map((issue) => `${issue.path.join(".") || "form"}: ${issue.message}`).join("; ") || "Invalid request";
+}
 
 export function listAccountsForAdmin(db: Db) {
 	return db

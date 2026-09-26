@@ -14,6 +14,7 @@ import {
 	getExistingMailbox,
 	listAccountsForAdmin,
 	requireTeamAdmin,
+	zodErrorMessage,
 } from "./utils";
 
 export async function GET(request: Request) {
@@ -31,7 +32,7 @@ export async function POST(request: Request) {
 
 	const parsed = createUserAccountSchema.safeParse(await request.json());
 	if (!parsed.success) {
-		return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
+		return NextResponse.json({ error: zodErrorMessage(parsed.error) }, { status: 400 });
 	}
 
 	const input: CreateUserAccountInput = parsed.data;
