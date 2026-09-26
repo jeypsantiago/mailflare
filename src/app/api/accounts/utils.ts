@@ -1,4 +1,4 @@
-import { and, desc, eq } from "drizzle-orm";
+import { and, asc, desc, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import type { ZodError } from "zod";
 import type { getDb } from "@/db";
@@ -28,7 +28,7 @@ export function listAccountsForAdmin(db: Db) {
 			createdAt: users.createdAt,
 		})
 		.from(users)
-		.orderBy(desc(users.createdAt));
+		.orderBy(asc(users.role), desc(users.createdAt));
 }
 
 export async function getDomainForAdmin(db: Db, adminUserId: string, domainId: string) {
