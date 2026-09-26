@@ -124,7 +124,7 @@ export default function AccountMailboxesPage() {
             value={domainId}
             onChange={(event) => setDomainId(event.target.value)}
             containerClassName="shrink-0 items-center"
-            className="h-10 w-auto bg-transparent px-1 text-sm"
+            className="h-10 bg-transparent px-1 text-sm"
           >
             {domains.map((domain) => (
               <option key={domain.id} value={domain.id}>
